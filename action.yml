@@ -12,16 +12,6 @@ inputs:
     required: true
     default: 'www-data'
 
-  yandex-storage-secret:
-    description: '***'
-    required: false
-    default: ''
-
-  yandex-storage-key:
-    description: '***'
-    required: false
-    default: ''
-
   config-file:
     description: 'Path to phpunit.xml'
     required: true
@@ -67,7 +57,7 @@ runs:
       shell: bash
 
     - name: run docker-compose
-      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} up --build --force-recreate --no-deps -d
+      run: docker-compose -f ${{ inputs.name-compose-file }} up --build --force-recreate --no-deps -d
       shell: bash
 
     - name: Wait run mysql
@@ -75,26 +65,26 @@ runs:
       shell: bash
 
     - name: Composer Install
-      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php composer install --no-progress --prefer-dist --optimize-autoloader
+      run: docker-compose -f ${{ inputs.name-compose-file }} exec -T -u ${{ inputs.docker-user }} php composer install --no-progress --prefer-dist --optimize-autoloader
       shell: bash
 
     - name: Post Install dependencies
       if: ${{ inputs.post-install-cmd == 'yes' }}
-      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php composer run-script post-install-cmd --no-interaction
+      run: docker-compose -f ${{ inputs.name-compose-file }} exec -T -u ${{ inputs.docker-user }} php composer run-script post-install-cmd --no-interaction
       shell: bash
 
     - name: Migrations
       if: ${{ inputs.migrate-command != 'no' }}
       run: |
-        docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php ${{ inputs.migrate-command }} migrate 2> /dev/null && echo 'skip'
-        docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php ${{ inputs.migrate-command }} migrate
+        docker-compose -f ${{ inputs.name-compose-file }} exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate 2> /dev/null && echo 'skip'
+        docker-compose -f ${{ inputs.name-compose-file }} exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate
       shell: bash
 
     - name: PHPUnit
-      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -u ${{ inputs.DOCKER_USER }} -T php php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: docker-compose -f ${{ inputs.name-compose-file }} exec -u ${{ inputs.docker-user }} -T php php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
     - name: Destroy docker
       if: always()
-      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} down -v
+      run: docker-compose -f ${{ inputs.name-compose-file }} down -v
       shell: bash
