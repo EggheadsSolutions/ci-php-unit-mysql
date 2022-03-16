@@ -22,16 +22,6 @@ inputs:
     required: false
     default: 'vendor/bin/phinx'
 
-  NAME_COMPOSE_FILE:
-    description: 'Name Docker Compose File'
-    required: false
-    default: 'docker-unittest.yml'
-
-  DOCKER_USER:
-    description: 'Docker User Name'
-    required: false
-    default: 'www-data'
-
   post-install-cmd:
     description: 'Composer Post Install CMD'
     required: false
@@ -65,7 +55,7 @@ runs:
       shell: bash
 
     - name: run docker-compose
-      run: docker-compose -f ${GITHUB_SHA}.yml.yml up --build --force-recreate --no-deps -d
+      run: docker-compose -f ${GITHUB_SHA}.yml up --build --force-recreate --no-deps -d
       shell: bash
 
     - name: Wait run mysql
