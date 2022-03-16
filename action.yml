@@ -52,12 +52,16 @@ runs:
   steps:
     - uses: actions/checkout@v2
 
+    - name: test env
+      run: env
+      shell: bash
+
     - name: Setup config
       run: mv ./${{ inputs.config-dir }}/app_local_ci.php ./${{ inputs.config-dir }}/app_local.php
       shell: bash
 
     - name: Rename Docker-compose
-      run: mv ${{ inputs.name-compose-file }} ${GITHUB_SHA}.yml
+      run: mv ${{ inputs.name-compose-file }} '${GITHUB_SHA}.yml
       shell: bash
 
     - name: run docker-compose
