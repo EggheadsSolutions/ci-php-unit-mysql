@@ -17,11 +17,6 @@ inputs:
     required: true
     default: 'phpunit.xml.dist'
 
-  config-file:
-    description: 'Path to phpunit.xml'
-    required: true
-    default: 'phpunit.xml.dist'
-
   migrate-command:
     description: 'Migrate command'
     required: false
