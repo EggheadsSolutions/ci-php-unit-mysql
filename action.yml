@@ -42,6 +42,11 @@ inputs:
     required: true
     default: ''
 
+  config-dir:
+    description: 'Config directory for app-local.php'
+    required: false
+    default: 'config'
+
 runs:
   using: "composite"
   steps:
