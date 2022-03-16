@@ -51,7 +51,7 @@ runs:
       shell: bash
 
     - name: Rename Docker-compose
-      run: mv ${{ inputs.name-compose-file }} '${GITHUB_SHA}.yml
+      run: mv ${{ inputs.name-compose-file }} ${GITHUB_SHA}.yml
       shell: bash
 
     - name: run docker-compose
@@ -84,5 +84,5 @@ runs:
 
     - name: Destroy docker
       if: always()
-      run: docker-compose -f ${GITHUB_SHA}.yml.yml down -v
+      run: docker-compose -f ${GITHUB_SHA}.yml down -v
       shell: bash
