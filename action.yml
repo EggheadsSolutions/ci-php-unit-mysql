@@ -47,10 +47,6 @@ inputs:
     required: false
     default: 'config'
 
-  commit:
-    description: 'Commit SHA'
-    required: true
-
 runs:
   using: "composite"
   steps:
@@ -61,11 +57,11 @@ runs:
       shell: bash
 
     - name: Rename Docker-compose
-      run: mv ${{ inputs.name-compose-file }} ${{ inputs.commit }}.yml
+      run: mv ${{ inputs.name-compose-file }} ${GITHUB_SHA}.yml
       shell: bash
 
     - name: run docker-compose
-      run: docker-compose -f ${{ inputs.commit }}.yml up --build --force-recreate --no-deps -d
+      run: docker-compose -f ${GITHUB_SHA}.yml.yml up --build --force-recreate --no-deps -d
       shell: bash
 
     - name: Wait run mysql
@@ -73,26 +69,26 @@ runs:
       shell: bash
 
     - name: Composer Install
-      run: docker-compose -f ${{ inputs.commit }}.yml exec -T -u ${{ inputs.docker-user }} php composer install --no-progress --prefer-dist --optimize-autoloader
+      run: docker-compose -f ${GITHUB_SHA}.yml.yml exec -T -u ${{ inputs.docker-user }} php composer install --no-progress --prefer-dist --optimize-autoloader
       shell: bash
 
     - name: Post Install dependencies
       if: ${{ inputs.post-install-cmd == 'yes' }}
-      run: docker-compose -f ${{ inputs.commit }}.yml exec -T -u ${{ inputs.docker-user }} php composer run-script post-install-cmd --no-interaction
+      run: docker-compose -f ${GITHUB_SHA}.yml.yml exec -T -u ${{ inputs.docker-user }} php composer run-script post-install-cmd --no-interaction
       shell: bash
 
     - name: Migrations
       if: ${{ inputs.migrate-command != 'no' }}
       run: |
-        docker-compose -f ${{ inputs.commit }}.yml exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate 2> /dev/null && echo 'skip'
-        docker-compose -f ${{ inputs.commit }}.yml exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate
+        docker-compose -f ${GITHUB_SHA}.yml.yml exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate 2> /dev/null && echo 'skip'
+        docker-compose -f ${GITHUB_SHA}.yml.yml exec -T -u ${{ inputs.docker-user }} php ${{ inputs.migrate-command }} migrate
       shell: bash
 
     - name: PHPUnit
-      run: docker-compose -f ${{ inputs.commit }}.yml exec -u ${{ inputs.docker-user }} -T php php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: docker-compose -f ${GITHUB_SHA}.yml.yml exec -u ${{ inputs.docker-user }} -T php php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
     - name: Destroy docker
       if: always()
-      run: docker-compose -f ${{ inputs.commit }}.yml down -v
+      run: docker-compose -f ${GITHUB_SHA}.yml.yml down -v
       shell: bash
