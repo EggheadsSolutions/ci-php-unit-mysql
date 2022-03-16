@@ -1,0 +1,100 @@
+name: 'PHP Unit MySQL'
+description: 'PHP Unit Test'
+
+inputs:
+  name-compose-file:
+    description: 'Name Docker-compose file'
+    required: true
+    default: 'docker-unittest.yml'
+
+  docker-user:
+    description: 'Docker User'
+    required: true
+    default: 'www-data'
+
+  yandex-storage-secret:
+    description: '***'
+    required: false
+    default: ''
+
+  yandex-storage-key:
+    description: '***'
+    required: false
+    default: ''
+
+  config-file:
+    description: 'Path to phpunit.xml'
+    required: true
+    default: 'phpunit.xml.dist'
+
+  config-file:
+    description: 'Path to phpunit.xml'
+    required: true
+    default: 'phpunit.xml.dist'
+
+  migrate-command:
+    description: 'Migrate command'
+    required: false
+    default: 'vendor/bin/phinx'
+
+  NAME_COMPOSE_FILE:
+    description: 'Name Docker Compose File'
+    required: false
+    default: 'docker-unittest.yml'
+
+  DOCKER_USER:
+    description: 'Docker User Name'
+    required: false
+    default: 'www-data'
+
+  post-install-cmd:
+    description: 'Composer Post Install CMD'
+    required: false
+    default: 'yes'
+
+  additional-parameters:
+    description: 'Additional parameters for the phpunit command'
+    required: true
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup config
+      run: mv ./${{ inputs.config-dir }}/app_local_ci.php ./${{ inputs.config-dir }}/app_local.php
+      shell: bash
+
+    - name: run docker-compose
+      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} up --build --force-recreate --no-deps -d
+      shell: bash
+
+    - name: Wait run mysql
+      run: sleep 20
+      shell: bash
+
+    - name: Composer Install
+      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php composer install --no-progress --prefer-dist --optimize-autoloader
+      shell: bash
+
+    - name: Post Install dependencies
+      if: ${{ inputs.post-install-cmd == 'yes' }}
+      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php composer run-script post-install-cmd --no-interaction
+      shell: bash
+
+    - name: Migrations
+      if: ${{ inputs.migrate-command != 'no' }}
+      run: |
+        docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php ${{ inputs.migrate-command }} migrate 2> /dev/null && echo 'skip'
+        docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -T -u ${{ inputs.DOCKER_USER }} php ${{ inputs.migrate-command }} migrate
+      shell: bash
+
+    - name: PHPUnit
+      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} exec -u ${{ inputs.DOCKER_USER }} -T php php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      shell: bash
+
+    - name: Destroy docker
+      if: always()
+      run: docker-compose -f ${{ inputs.NAME_COMPOSE_FILE }} down -v
+      shell: bash
