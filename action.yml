@@ -37,6 +37,7 @@ inputs:
     required: false
     default: 'config'
 
+
 runs:
   using: "composite"
   steps:
@@ -61,7 +62,7 @@ runs:
       shell: bash
 
     - name: run docker-compose
-      run: docker-compose -f ${GITHUB_SHA}.yml up --no-recreate --build -d
+      run: docker-compose -f ${GITHUB_SHA}.yml up --force-recreate --build -d
       shell: bash
 
     - name: Wait run mysql
@@ -88,7 +89,7 @@ runs:
       run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
-    - name: Destroy docker
-      if: always()
-      run: docker-compose -f ${GITHUB_SHA}.yml down -v
-      shell: bash
+    # - name: Destroy docker
+    #   if: always()
+    #   run: docker-compose -f ${GITHUB_SHA}.yml down -v
+    #   shell: bash
