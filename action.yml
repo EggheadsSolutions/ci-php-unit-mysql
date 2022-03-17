@@ -53,7 +53,11 @@ runs:
     - name: Rename Services
       run: |
         sed -i 's/  php:/  php-${RUNNER_NAME}:/g' ${GITHUB_SHA}.yml
-        sed -i 's/  mysql:/  mysql:-${RUNNER_NAME}:/g' ${GITHUB_SHA}.yml
+        sed -i 's/  mysql:/  mysql-${RUNNER_NAME}:/g' ${GITHUB_SHA}.yml
+      shell: bash
+
+    - name: cat
+      run: cat ${GITHUB_SHA}.yml
       shell: bash
 
     - name: run docker-compose
