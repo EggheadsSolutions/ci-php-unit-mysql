@@ -51,7 +51,7 @@ runs:
       shell: bash
 
     - name: run docker-compose
-      run: docker-compose -f ${GITHUB_SHA}.yml up --build -d
+      run: docker-compose -f ${GITHUB_SHA}.yml up -p new_project_name --build -d
       shell: bash
 
     - name: Wait run mysql
