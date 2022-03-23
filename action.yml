@@ -66,7 +66,7 @@ runs:
       shell: bash
 
     - name: Wait run mysql
-      run: sleep 20
+      run: sleep 30
       shell: bash
 
     - name: Composer Install
