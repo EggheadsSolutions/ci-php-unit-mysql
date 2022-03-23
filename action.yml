@@ -89,7 +89,9 @@ runs:
       run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
-    # - name: Destroy docker
-    #   if: always()
-    #   run: docker-compose -f ${GITHUB_SHA}.yml down -v
-    #   shell: bash
+    - name: Destroy docker
+      if: always()
+      run: |
+        docker rm -f php-${RUNNER_NAME}
+        docker rm -f mysql-${RUNNER_NAME}
+      shell: bash
