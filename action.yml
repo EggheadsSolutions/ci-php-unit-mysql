@@ -69,7 +69,7 @@ runs:
       run: |
         status=true
         while $status; do
-          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld')
+          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld') || true
           echo $connect
           if [[ "$connect" == *alive* ]]; then
             status=false
