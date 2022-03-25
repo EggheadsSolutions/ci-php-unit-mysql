@@ -66,7 +66,17 @@ runs:
       shell: bash
 
     - name: Wait run mysql
-      run: sleep 40
+      run: |
+        status=true
+        while $status
+        do
+          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -pr00tme | grep 'mysqld')
+          if [[ "$connect" == *alive* ]]; then
+            status=false
+          else
+            sleep 5
+          fi
+        done
       shell: bash
 
     - name: Composer Install
