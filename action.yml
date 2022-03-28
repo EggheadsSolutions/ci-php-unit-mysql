@@ -55,6 +55,7 @@ runs:
       run: |
         sed -i "s/  php:/  php-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
         sed -i "s/  mysql:/  mysql-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
+        sed -i "s/  redis:/  mysql-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
       shell: bash
 
     - name: cat
@@ -103,4 +104,5 @@ runs:
       run: |
         docker rm -f php-${RUNNER_NAME}
         docker rm -f mysql-${RUNNER_NAME}
+        docker rm -f redis-${RUNNER_NAME}
       shell: bash
