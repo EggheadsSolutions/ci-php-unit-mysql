@@ -55,11 +55,13 @@ runs:
           chmod 600 ./config/egg_repository_key
           mkdir ./.ssh
           chmod 700 ./.ssh
-          echo 'Host github.com' > ./.ssh/config
-          echo '  HostName github.com' >> ./.ssh/config
-          echo '  User git' >> ./.ssh/config
-          echo '  IdentityFile /var/www/config/egg_repository_key' >> ./.ssh/config
-          echo '  StrictHostKeyChecking no' >> ./.ssh/config
+          cat > ./.ssh/config <<END
+          Host github.com
+            HostName github.com
+            User git
+            IdentityFile /var/www/config/egg_repository_key
+            StrictHostKeyChecking no
+          END
       shell: bash
 
     - name: Setup config
