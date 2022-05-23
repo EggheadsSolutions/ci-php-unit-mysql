@@ -50,7 +50,9 @@ runs:
 
     - name: Import SSH Key
       if: ${{ inputs.composer-private-repo-key != 'no' }}
-      run: echo "$SSH_KEY" > ./config/egg_repository_key
+      run: |
+          echo "$SSH_KEY" > ./config/egg_repository_key
+          chmod 600 ./config/egg_repository_key
       shell: bash
 
     - name: Setup config
