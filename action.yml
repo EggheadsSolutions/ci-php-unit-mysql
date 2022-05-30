@@ -7,6 +7,11 @@ inputs:
     required: true
     default: 'docker-unittest.yml'
 
+  compose-dir-path:
+    description: 'Compose directory path'
+    required: true
+    default: '.'
+
   docker-user:
     description: 'Docker User'
     required: true
@@ -69,7 +74,7 @@ runs:
       shell: bash
 
     - name: Rename Docker-compose
-      run: mv ${{ inputs.name-compose-file }} ${GITHUB_SHA}.yml
+      run: mv ${{ inputs.compose-dir-path }}/${{ inputs.name-compose-file }} ${GITHUB_SHA}.yml
       shell: bash
 
     - name: Rename Services
