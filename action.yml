@@ -47,11 +47,21 @@ inputs:
     required: true
     default: 'no'
 
+  CA:
+    description: 'CA'
+    required: true
+    default: 'no'
+
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v2
+
+    - name: Copy CA.pem
+      if: ${{ inputs.CA != 'no' }}
+      run: echo "${{ secrets.CA }}" > ./config/CA.pem
+      shell: bash
 
     - name: Import SSH Key
       if: ${{ inputs.composer-private-repo-key != 'no' }}
