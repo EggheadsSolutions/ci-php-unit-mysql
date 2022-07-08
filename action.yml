@@ -60,7 +60,7 @@ runs:
 
     - name: Copy CA.pem
       if: ${{ inputs.CA != 'no' }}
-      run: echo "${{ secrets.CA }}" > ./config/CA.pem
+      run: echo "$CA" > ./config/CA.pem
       shell: bash
 
     - name: Import SSH Key
