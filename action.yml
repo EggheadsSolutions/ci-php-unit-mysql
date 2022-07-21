@@ -52,6 +52,11 @@ inputs:
     required: true
     default: 'no'
 
+  printer:
+    description: 'printer'
+    required: true
+    default: '--printer mheap\\GithubActionsReporter\\Printer'
+
 
 runs:
   using: "composite"
@@ -132,7 +137,7 @@ runs:
       shell: bash
 
     - name: PHPUnit
-      run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit ${{ inputs.printer }} --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
     - name: Destroy docker
