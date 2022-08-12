@@ -61,6 +61,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Destroy docker
+      if: always()
+      run: |
+        docker rm -f php-${RUNNER_NAME}
+        docker rm -f mysql-${RUNNER_NAME}
+        docker rm -f redis-${RUNNER_NAME}
+      shell: bash
+
     - uses: actions/checkout@v2
 
     - name: Copy CA.pem
