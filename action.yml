@@ -61,6 +61,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Destroy docker
+      if: always()
+      run: |
+        docker rm -f php-${RUNNER_NAME}
+        docker rm -f mysql-${RUNNER_NAME}
+        docker rm -f redis-${RUNNER_NAME}
+      shell: bash
+
     - uses: actions/checkout@v2
 
     - name: Copy CA.pem
@@ -112,7 +120,7 @@ runs:
       run: |
         status=true
         while $status; do
-          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld') || true
+          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u mysql mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld') || true
           if [[ "$connect" == *alive* ]]; then
             status=false
           else
