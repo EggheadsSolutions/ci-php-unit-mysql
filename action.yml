@@ -68,6 +68,7 @@ runs:
         docker rm -f mysql-${RUNNER_NAME}
         docker rm -f redis-${RUNNER_NAME}
         docker rm -f postgres-${RUNNER_NAME}
+        rm -rf ./docker
       shell: bash
 
     - uses: actions/checkout@v2
@@ -158,4 +159,5 @@ runs:
         docker rm -f mysql-${RUNNER_NAME}
         docker rm -f redis-${RUNNER_NAME}
         docker rm -f postgres-${RUNNER_NAME}
+        rm -rf ./docker
       shell: bash
