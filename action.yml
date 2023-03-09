@@ -61,17 +61,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Destroy docker
-      if: always()
-      run: |
-        docker rm -f php-${RUNNER_NAME}
-        docker rm -f mysql-${RUNNER_NAME}
-        docker rm -f redis-${RUNNER_NAME}
-        docker rm -f postgres-${RUNNER_NAME}
-        rm -rf ./docker
-      shell: bash
-
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Copy CA.pem
       if: ${{ inputs.CA != 'no' }}
@@ -108,7 +98,6 @@ runs:
         sed -i "s/  mysql:/  mysql-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
         sed -i "s/  redis:/  redis-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
         sed -i "s/  mysql_data:/  mysql_data-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
-        sed -i "s/  postgres:/  postgres-${RUNNER_NAME}:/g" ${GITHUB_SHA}.yml
       shell: bash
 
     - name: cat
@@ -123,7 +112,7 @@ runs:
       run: |
         status=true
         while $status; do
-          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u mysql mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld') || true
+          connect=$(docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} mysql-${RUNNER_NAME} mysqladmin ping -h localhost -uroot -proot | grep 'mysqld') || true
           if [[ "$connect" == *alive* ]]; then
             status=false
           else
@@ -149,7 +138,7 @@ runs:
       shell: bash
 
     - name: PHPUnit
-      run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit --verbose ${{ inputs.printer }} --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: docker-compose -f ${GITHUB_SHA}.yml exec -u ${{ inputs.docker-user }} -T php-${RUNNER_NAME} php -dxdebug.mode=develop vendor/bin/phpunit ${{ inputs.printer }} --colors=always -c ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
     - name: Destroy docker
@@ -158,6 +147,4 @@ runs:
         docker rm -f php-${RUNNER_NAME}
         docker rm -f mysql-${RUNNER_NAME}
         docker rm -f redis-${RUNNER_NAME}
-        docker rm -f postgres-${RUNNER_NAME}
-        rm -rf ./docker
       shell: bash
